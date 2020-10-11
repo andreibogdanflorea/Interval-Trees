@@ -1,0 +1,46 @@
+Florea Andrei-Bogdan, 313CD
+
+3. Implementare C Arbori de Intervale
+
+Pentru construirea arborelui, am alocat memorie pentru structura si am atribuit campurile care se puteau atribui direct. Pentru arbore efectiv, am folosit functia
+recursiva prezentata in enunt pentru a-l crea nod cu nod. Dimensiunea arborelui am calculat-o cu ajutorul functiei recursive, incrementand valoarea referentiata de
+pointer-ul *dimensiune transmis ca parametru.
+Pentru actualizare si interogare, am implementat direct algoritmul descris in enunt.
+
+
+4. Intersectii de intervale
+
+In primul rand, am implementat functia de citire, respectand formatul de intrare.
+
+Pentru varianta triviala, pentru fiecare pereche de intervale, am folosit trei functii: una care afla daca se intersecteaza, una care afla daca un segment este
+orizontal, si ultima care afla daca un segment este vertical. Daca perechea de intervale era de forma (orizontal, vertical), treceam direct sa aflu daca se
+intersecteaza. Daca erau de forma (vertical, orizontal), le interschimbam si foloseam functia de intersectie.
+
+Pentru varianta cu arbore de intervale, am construit arborele avand in radacina asociat intervalul [0, y_max] (y_max aflat cu ajutorul unei functii separate).
+Am construit o lista separata de "PuncteCuInterval" (o structura creata de mine, care contine un punct si intervalul din care face parte) si am sortat cele
+2 * lista->dimensiune (lista de intervale) PuncteCuInterval cu ajutorul functiei qsort. Apoi, am parcurs lista de PuncteCuInterval, si aici aveam mai multe cazuri:
+ - daca punctul era capatul stang al unui interval orizontal, actualizez cu 1 intervalul [punct_y punct_y] din arborele de intervale
+ - daca punctul era capatul drept al unui interval orizontal, actualizez cu -1 acelasi interval
+ - daca punctul era capatul stang al unui interval vertical (nu si capatul drept, ca sa nu adaug de doua ori intersectiile), foloseam functia de interogare
+pentru intervalul [y_punct_jos, y_punct_sus] al acestui segment vertical
+
+
+5. Pozitie libera
+
+In primul rand, am citit datele din fisier in functia asociata.
+
+Pentru varianta triviala, am parcurs elementele din lista de intrare si, pentru elementul curent, cautam de la dreapta la stanga, de la pozitia indicata fix de
+valoarea acestuia, prima pozitie neocupata din lista nou. Aceasta era pozitia la care puneam elementul.
+
+Pentru varianta cu arbore de intervale, am creat arborele, avand ca valoare_predefinita_raspuns_copil pe -1, functia de actualizare o functie actualizare_marcheaza_pozitie
+(pe care urmeaza sa o explic mai jos), si functia de combinare_raspunsuri_copii o functie care intoarce valorea maxima dintre raspunsurile copiilor.
+Am folosit functia seteaza_info_in_arbore_la_valoare_capat_dreapta, pentru ca fiecare nod din arbore sa aiba ca informatie utila valoarea din capatul dreapta
+al intervalului. 
+Ideea pe care am folosit-o este ca, la un moment dat, nodul contine cea mai din dreapta pozitie neocupata din cadrul intervalului asociat,  sau -1 daca toate 
+pozitiile sunt ocupate.
+Am inceput parcurgerea listei de intrari. Pentru un element, pozitia la care trebuia sa il adaug in lista noua era data de interogarea pe intervalul [0, element].
+Daca pozitia era negativa (nu mai era loc in care puteam sa il adaug), "saream" elementul. Altfel, il adaugam in lista noua. Apoi, actualizam pe intervalul [pozitie, pozitie],
+iar functia de actualizare, actualizare_marcheaza_pozitia, functioneaza in felul urmator: pentru o frunza (pentru care copilul stang si copilul drept sunt nuli), pun -1 
+(practic se intampla fix cand ajung la intervalul [pozitie, pozitie] si astfel marchez ca pozitia este ocupata), iar altfel, pun maximul dintre valoarea din copilul stang 
+si valoarea din copilul drept (ceea ce inseamna ca pentru un nod intern o sa am cea mai mare "pozitie" din intervalul sau, care nu a fost inca ocupata).
+
